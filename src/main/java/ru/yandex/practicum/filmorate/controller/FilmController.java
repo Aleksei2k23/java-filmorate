@@ -47,8 +47,7 @@ public class FilmController {
             if (film.getDurationInMinutes() <= 0) {
                 throw new ValidationException("Продолжительность фильма должна быть больше нуля.");
             }
-        }
-        catch (ValidationException e) {
+        } catch (ValidationException e) {
             log.error("Фильм не прошёл валидацию: {}", e.getMessage());
             throw e;
         }
