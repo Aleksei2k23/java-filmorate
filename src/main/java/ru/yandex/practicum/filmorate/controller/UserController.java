@@ -1,5 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -10,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RestController
 public class UserController {
     private List<User> users = new ArrayList<>();
@@ -25,20 +29,31 @@ public class UserController {
                 users.stream().filter(u -> u.getId() == user.getId()).findAny();
         if (existingUserOpt.isPresent()) {
             users.remove(existingUserOpt.get());
+            users.add(user);
+            log.info("Обновлён пользователь {}", user);
         }
-        users.add(user);
+        else {
+            users.add(user);
+            log.info("Добавлен пользователь {}", user);
+        }
         return user;
     }
 
     private void validateUser(User user) {
-        if (user.getEmail().equals("") || !user.getEmail().contains("@")) {
-            throw new ValidationException("Email не должен быть пустым и должен содержать символ '@'.");
+        try {
+            if (user.getEmail().equals("") || !user.getEmail().contains("@")) {
+                throw new ValidationException("Email не должен быть пустым и должен содержать символ '@'.");
+            }
+            if (user.getLogin().equals("") || user.getLogin().contains(" ")) {
+                throw new ValidationException("Логин не может быть пустым и не может содержать пробелы.");
+            }
+            if (user.getBirthday().isAfter(LocalDate.now())) {
+                throw new ValidationException("Дата рождения не может быть в будущем.");
+            }
         }
-        if (user.getLogin().equals("") || user.getLogin().contains(" ")) {
-            throw new ValidationException("Логин не может быть пустым и не может содержать пробелы.");
-        }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            throw new ValidationException("Дата рождения не может быть в будущем.");
+        catch (ValidationException e) {
+            log.error("Пользователь не прошёл валидацию: {}", e.getMessage());
+            throw e;
         }
     }
 
