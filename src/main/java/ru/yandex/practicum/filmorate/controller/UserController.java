@@ -15,8 +15,8 @@ import java.util.Optional;
 public class UserController {
     private List<User> users = new ArrayList<>();
 
-    @PutMapping("/user")
-    public User addOrUpdate(@RequestBody User user) {
+    @PutMapping("/users")
+    public User update(@RequestBody User user) {
         validateUser(user);
         if (user.getName().equals("")) {
             user.setName(user.getLogin());
@@ -32,6 +32,18 @@ public class UserController {
             users.add(user);
             log.info("Добавлен пользователь {}", user);
         }
+        return user;
+    }
+
+    @PostMapping("/users")
+    public User create(@RequestBody User user) {
+        validateUser(user);
+
+        if (users.contains(user)) {
+            log.error("Пользователь уже существует.");
+            throw new ValidationException("Пользователь уже существует.");
+        }
+        users.add(user);
         return user;
     }
 

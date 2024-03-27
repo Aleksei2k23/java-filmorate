@@ -16,8 +16,8 @@ import java.util.Optional;
 public class FilmController {
     private List<Film> films = new ArrayList<>();
 
-    @PutMapping("/film")
-    public Film addOrUpdate(@RequestBody Film film) {
+    @PutMapping("/films")
+    public Film update(@RequestBody Film film) {
         validateFilm(film);
 
         Optional<Film> existingFilmOpt =
@@ -33,6 +33,18 @@ public class FilmController {
         return film;
     }
 
+    @PostMapping("/films")
+    public Film create(@RequestBody Film film) {
+        validateFilm(film);
+
+        if(films.contains(film)) {
+            log.error("Фильм уже существует.");
+            throw new ValidationException("Фильм уже существует.");
+        }
+        films.add(film);
+        return film;
+    }
+
     private void validateFilm(Film film) {
         try {
             if (film.getName().equals("")) {
@@ -44,7 +56,7 @@ public class FilmController {
             if (film.getReleaseDate().isBefore(LocalDate.of(1895, Month.DECEMBER, 28))) {
                 throw new ValidationException("Дата релиза должна быть не ранее 28 декабря 1895 года.");
             }
-            if (film.getDurationInMinutes() <= 0) {
+            if (film.getDuration() <= 0) {
                 throw new ValidationException("Продолжительность фильма должна быть больше нуля.");
             }
         } catch (ValidationException e) {
