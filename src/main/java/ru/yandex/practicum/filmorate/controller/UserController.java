@@ -13,6 +13,7 @@ import java.util.Optional;
 @Slf4j
 @RestController
 public class UserController {
+    private static int nextId = 0;
     private List<User> users = new ArrayList<>();
 
     @PutMapping("/users")
@@ -30,8 +31,6 @@ public class UserController {
             log.info("Обновлён пользователь {}", user);
         } else {
             throw new ValidationException("Пользователь не существует.");
-//            users.add(user);
-//            log.info("Добавлен пользователь {}", user);
         }
         return user;
     }
@@ -39,6 +38,7 @@ public class UserController {
     @PostMapping("/users")
     public User create(@RequestBody User user) {
         validateUser(user);
+        user.setId(++nextId);
         if (user.getName() == null || user.getName().equals("")) {
             user.setName(user.getLogin());
         }

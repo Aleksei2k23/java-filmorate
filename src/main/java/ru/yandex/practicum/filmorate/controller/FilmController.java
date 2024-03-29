@@ -14,6 +14,7 @@ import java.util.Optional;
 @Slf4j
 @RestController
 public class FilmController {
+    private static int nextId = 0;
     private List<Film> films = new ArrayList<>();
 
     @PutMapping("/films")
@@ -28,8 +29,6 @@ public class FilmController {
             log.info("Обновлён фильм {}", film);
         } else {
             throw new ValidationException("Фильм не существует.");
-//            films.add(film);
-//            log.info("Добавлен фильм {}", film);
         }
         return film;
     }
@@ -37,6 +36,7 @@ public class FilmController {
     @PostMapping("/films")
     public Film create(@RequestBody Film film) {
         validateFilm(film);
+        film.setId(++nextId);
 
         if(films.contains(film)) {
             log.error("Фильм уже существует.");
