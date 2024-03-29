@@ -18,7 +18,7 @@ public class UserController {
     @PutMapping("/users")
     public User update(@RequestBody User user) {
         validateUser(user);
-        if (user.getName().equals("")) {
+        if (user.getName() == null || user.getName().equals("")) {
             user.setName(user.getLogin());
         }
 
@@ -29,8 +29,9 @@ public class UserController {
             users.add(user);
             log.info("Обновлён пользователь {}", user);
         } else {
-            users.add(user);
-            log.info("Добавлен пользователь {}", user);
+            throw new ValidationException("Пользователь не существует.");
+//            users.add(user);
+//            log.info("Добавлен пользователь {}", user);
         }
         return user;
     }
@@ -38,6 +39,9 @@ public class UserController {
     @PostMapping("/users")
     public User create(@RequestBody User user) {
         validateUser(user);
+        if (user.getName() == null || user.getName().equals("")) {
+            user.setName(user.getLogin());
+        }
 
         if (users.contains(user)) {
             log.error("Пользователь уже существует.");

@@ -27,8 +27,9 @@ public class FilmController {
             films.add(film);
             log.info("Обновлён фильм {}", film);
         } else {
-            films.add(film);
-            log.info("Добавлен фильм {}", film);
+            throw new ValidationException("Фильм не существует.");
+//            films.add(film);
+//            log.info("Добавлен фильм {}", film);
         }
         return film;
     }
