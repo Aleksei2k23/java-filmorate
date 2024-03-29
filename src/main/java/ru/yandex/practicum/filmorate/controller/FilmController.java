@@ -38,7 +38,7 @@ public class FilmController {
         validateFilm(film);
         film.setId(++nextId);
 
-        if(films.contains(film)) {
+        if (films.contains(film)) {
             log.error("Фильм уже существует.");
             throw new ValidationException("Фильм уже существует.");
         }
