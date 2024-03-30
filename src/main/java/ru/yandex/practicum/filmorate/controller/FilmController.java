@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmStorage;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -14,15 +15,14 @@ import java.util.Optional;
 @Slf4j
 @RestController
 public class FilmController {
-    private static int nextId = 0;
-    private List<Film> films = new ArrayList<>();
+    private FilmStorage films = new FilmStorage();
 
     @PutMapping("/films")
     public Film update(@RequestBody Film film) {
         validateFilm(film);
 
         Optional<Film> existingFilmOpt =
-                films.stream().filter(f -> f.getId() == film.getId()).findAny();
+                films.getFilmById(film.getId());
         if (existingFilmOpt.isPresent()) {
             films.remove(existingFilmOpt.get());
             films.add(film);
@@ -37,7 +37,7 @@ public class FilmController {
     @PostMapping("/films")
     public Film create(@RequestBody Film film) {
         validateFilm(film);
-        film.setId(++nextId);
+        film.setId(FilmStorage.getNextId());
 
         if (films.contains(film)) {
             log.error("Фильм уже существует.");
@@ -69,6 +69,6 @@ public class FilmController {
 
     @GetMapping("/films")
     public List<Film> getAllFilms() {
-        return new ArrayList<>(films);
+        return films.getAllFilms();
     }
 }
