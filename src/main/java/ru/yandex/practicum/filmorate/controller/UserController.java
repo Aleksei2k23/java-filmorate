@@ -19,7 +19,7 @@ public class UserController {
     @PutMapping("/users")
     public User update(@RequestBody User user) {
         validateUser(user);
-        if (user.getName() == null || user.getName().equals("")) {
+        if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
 
@@ -30,6 +30,7 @@ public class UserController {
             users.add(user);
             log.info("Обновлён пользователь {}", user);
         } else {
+            log.error("Пользователь не существует.");
             throw new ValidationException("Пользователь не существует.");
         }
         return user;
@@ -39,7 +40,7 @@ public class UserController {
     public User create(@RequestBody User user) {
         validateUser(user);
         user.setId(++nextId);
-        if (user.getName() == null || user.getName().equals("")) {
+        if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
 

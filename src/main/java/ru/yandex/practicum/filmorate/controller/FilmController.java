@@ -28,6 +28,7 @@ public class FilmController {
             films.add(film);
             log.info("Обновлён фильм {}", film);
         } else {
+            log.error("Фильм уже существует.");
             throw new ValidationException("Фильм не существует.");
         }
         return film;
@@ -48,7 +49,7 @@ public class FilmController {
 
     private void validateFilm(Film film) {
         try {
-            if (film.getName().equals("")) {
+            if (film.getName().isEmpty()) {
                 throw new ValidationException("Название фильма не может быть пустым.");
             }
             if (film.getDescription().length() > 200) {
