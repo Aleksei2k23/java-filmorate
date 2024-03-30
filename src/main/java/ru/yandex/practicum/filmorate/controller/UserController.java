@@ -4,17 +4,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.UserStorage;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @RestController
 public class UserController {
-    private static int nextId = 0;
-    private List<User> users = new ArrayList<>();
+    private UserStorage users = new UserStorage();
 
     @PutMapping("/users")
     public User update(@RequestBody User user) {
@@ -24,7 +23,7 @@ public class UserController {
         }
 
         Optional<User> existingUserOpt =
-                users.stream().filter(u -> u.getId() == user.getId()).findAny();
+                users.getUserById(user.getId());
         if (existingUserOpt.isPresent()) {
             users.remove(existingUserOpt.get());
             users.add(user);
@@ -39,7 +38,7 @@ public class UserController {
     @PostMapping("/users")
     public User create(@RequestBody User user) {
         validateUser(user);
-        user.setId(++nextId);
+        user.setId(UserStorage.getNextId());
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
@@ -71,6 +70,6 @@ public class UserController {
 
     @GetMapping("/users")
     public List<User> getAllUsers() {
-        return new ArrayList<>(users);
+        return users.getAllUsers();
     }
 }
